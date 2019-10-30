@@ -21,7 +21,7 @@ class CommandHandler {
         } catch (error) {
             console.error(error);
             try {
-                await msg.channel.send({
+                await msg.channel.createMessage({
                     embed: {
                         color: 0xDC143C,
                         description: error.toString()

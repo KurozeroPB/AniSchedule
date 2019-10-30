@@ -2,10 +2,10 @@ require("dotenv").config();
 const fs = require("fs");
 const CommandLoader = require("./structures/CommandLoader");
 const CommandHandler = require("./structures/CommandHandler");
-const { Client } = require("discord.js");
+const { Client } = require("eris");
 const { getAnnouncementEmbed, getFromNextDays, query, requireText } = require("./util");
 
-const client = new Client();
+const client = new Client(process.env.BOT_TOKEN);
 const commandLoader = new CommandLoader();
 const commandHandler = new CommandHandler(client);
 
@@ -16,7 +16,7 @@ let ready = false;
 
 client.on("ready", async () => {
     if (!ready) {
-        console.log(`Logged in as ${client.user.tag}`);
+        console.log(`Logged in as ${client.user.username}#${client.user.discriminator}`);
 
         if (fs.existsSync(dataFile)) {
             data = JSON.parse(fs.readFileSync(dataFile));
@@ -37,15 +37,15 @@ client.on("ready", async () => {
 
 client.on("error", console.error);
 
-client.on("message", async (msg) => {
+client.on("messageCreate", async (msg) => {
     if (!ready) return; // Bot not ready yet
-    if (!msg.guild) return;
+    if (!msg.channel.guild) return;
     if (!msg.author) return;
     if (msg.author.bot) return;
     if (msg.author.discriminator === "0000") return; // Probably a webhook
 
     if (msg.content.startsWith(commandPrefix)) {
-        const serverData = data[msg.guild.id] || {};
+        const serverData = data[msg.channel.guild.id] || {};
         const ret = await commandHandler.handleCommand(msg, serverData);
         if (ret) {
             data[msg.guild.id] = ret;
@@ -54,7 +54,7 @@ client.on("message", async (msg) => {
     }
 });
 
-client.login(process.env.BOT_TOKEN);
+client.connect().catch(console.error);
 
 function handleSchedules(time, page) {
     query(requireText("./query/Schedule.graphql", require), { page: page, watched: getAllWatched(), nextDay: time }).then((res) => {
@@ -92,10 +92,10 @@ function makeAnnouncement(entry, date, upNext = false) {
                 return;
 
             if (channelData.shows.includes(entry.media.id)) {
-                const channel = client.channels.find(v => v.id === channelId);
+                const channel = client.getChannel(channelId);
                 if (channel) {
                     console.log(`Announcing episode ${entry.media.title.romaji} to ${channel.guild.name}@${channel.id}`);
-                    channel.send({ embed });
+                    channel.createMessage({ embed });
                 }
             }
         });

@@ -9,7 +9,7 @@ class Cleanup extends Command {
     async run(message, args, client, data) {
         const channelData = data[message.channel.id];
         if (!channelData || !channelData.shows || channelData.shows.length === 0) {
-            message.react("👎");
+            message.addReaction("👎");
             return;
         }
 
@@ -28,10 +28,10 @@ class Cleanup extends Command {
                 delete channelData.shows[channelData.shows.indexOf(e.id)];
         });
 
-        message.channel.send(`Removed ${finished.length} shows from the list.`);
+        message.channel.createMessage(`Removed ${finished.length} shows from the list.`);
 
         data[message.channel.id] = channelData;
-        message.react("👍");
+        message.addReaction("👍");
 
         return data;
     }

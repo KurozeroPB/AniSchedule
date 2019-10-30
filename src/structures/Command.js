@@ -16,9 +16,9 @@ class Command {
     checkModifyPermission(message) {
         switch (process.env.PERMISSION_TYPE) {
             case "CHANNEL_MANAGER":
-                return message.channel.permissionsFor(message.author).has("MANAGE_CHANNELS");
+                return message.channel.permissionsOf(message.author.id).has("manageChannels");
             case "SERVER_OWNER":
-                return message.author.id === message.guild.ownerID;
+                return message.author.id === message.channel.guild.ownerID;
             default:
                 return true;
         }

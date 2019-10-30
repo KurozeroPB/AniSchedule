@@ -24,7 +24,7 @@ class Help extends Command {
 
         client.commands.forEach((v) => embed.fields.push({ name: v.name, value: v.description, inline: true }));
 
-        message.channel.send({ embed });
+        message.channel.createMessage({ embed });
     }
 }
 

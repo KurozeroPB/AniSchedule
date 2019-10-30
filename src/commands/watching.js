@@ -12,7 +12,7 @@ class Watching extends Command {
         
         const channelData = data[message.channel.id];
         if (!channelData || !channelData.shows || channelData.shows.length === 0) {
-            message.react("👎");
+            message.addReaction("👎");
             return;
         }
 
@@ -43,7 +43,7 @@ class Watching extends Command {
                 return;
             }
             if (description.length === 0)
-                message.channel.send("No currently airing shows are being announced.");
+                message.channel.createMessage("No currently airing shows are being announced.");
         }
     }
 
@@ -58,7 +58,7 @@ class Watching extends Command {
             },
             description
         };
-        channel.send({ embed });
+        channel.createMessage({ embed });
     }
 }
 

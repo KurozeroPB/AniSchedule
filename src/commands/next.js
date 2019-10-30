@@ -10,7 +10,7 @@ class Next extends Command {
     async run(message, args, client, data) {
         const channelData = data[message.channel.id];
         if (!channelData || !channelData.shows || channelData.shows.length === 0) {
-            message.react("👎");
+            message.addReaction("👎");
             return;
         }
 
@@ -23,14 +23,14 @@ class Next extends Command {
         }
 
         if (res.data.Page.airingSchedules.length === 0) {
-            message.react("👎");
+            message.addReaction("👎");
 
             return;
         }
 
         const anime = res.data.Page.airingSchedules[0];
         const embed = getAnnouncementEmbed(anime, new Date(anime.airingAt * 1000), true);
-        message.channel.send({ embed });
+        message.channel.createMessage({ embed });
     }
 }
 

@@ -20,8 +20,8 @@
     "dependencies": {
         "@kurozero/collection": "^0.4.8",
         "cross-env": "^6.0.3",
-        "discord.js": "^11.4.2",
         "dotenv": "^6.2.0",
+        "eris": "^0.11.0",
         "express": "^4.16.4",
         "node-fetch": "^2.3.0"
     }

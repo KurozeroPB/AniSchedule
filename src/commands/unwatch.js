@@ -10,27 +10,27 @@ class Unwatch extends Command {
 
     async run(message, args, client, data) {
         if (!this.checkModifyPermission(message)) {
-            message.react("👎");
+            message.addReaction("👎");
             return;
         }
 
 
         const channelData = data[message.channel.id];
         if (!channelData || !channelData.shows || channelData.shows.length === 0) {
-            message.react("🤷");
+            message.addReaction("🤷");
 
             return;
         }
 
         const watchId = await this.getMediaId(args[0]);
         if (!watchId || !channelData.shows.includes(watchId)) {
-            message.react("👎");
+            message.addReaction("👎");
 
             return;
         }
         channelData.shows = channelData.shows.filter(id => id !== watchId);
         data[message.channel.id] = channelData;
-        message.react("👍");
+        message.addReaction("👍");
 
         return data;
     }

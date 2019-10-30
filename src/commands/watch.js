@@ -10,7 +10,7 @@ class Watch extends Command {
 
     async run(message, args, client, data) {
         if (!this.checkModifyPermission(message)) {
-            message.react("👎");
+            message.addReaction("👎");
             return;
         }
 
@@ -20,14 +20,14 @@ class Watch extends Command {
 
         const watchId = await this.getMediaId(args[0]);
         if (!watchId || watched.includes(watchId)) {
-            message.react("👎");
+            message.addReaction("👎");
             return;
         }
         watched.push(watchId);
         channelData.shows = watched;
         data[message.channel.id] = channelData;
-        message.channel.stopTyping();
-        message.react("👍");
+        // message.channel.stopTyping();
+        message.addReaction("👍");
         return data;
     }
 }
