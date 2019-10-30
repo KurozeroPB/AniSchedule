@@ -1,6 +1,5 @@
 //require("dotenv").config();
-const requireText = require("require-text");
-const { getAnnouncementEmbed, getFromNextDays, query } = require("./util");
+const { getAnnouncementEmbed, getFromNextDays, query, requireText } = require("./util");
 
 const alIdRegex = /anilist\.co\/anime\/(.\d*)/;
 const malIdRegex = /myanimelist\.net\/anime\/(.\d*)/;

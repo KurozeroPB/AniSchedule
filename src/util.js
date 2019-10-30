@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const fs = require("fs");
 
 const streamingSites = [
     "Amazon",
@@ -13,6 +14,10 @@ const rBlockedStreamingSites = [
     "Viz",
     "Hulu"
 ];
+
+exports.requireText = (name, require) => {
+    return fs.readFileSync(require.resolve(name)).toString();
+}
 
 exports.query = async (query, variables) => {
     const res = await fetch("https://graphql.anilist.co", {

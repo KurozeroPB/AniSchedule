@@ -1,11 +1,10 @@
 require("dotenv").config();
-const requireText = require("require-text");
 const discord = require("discord.js");
 const client = new discord.Client();
 const flatten = require("array-flatten");
 const fs = require("fs");
 const commands = require("./commands");
-const { getAnnouncementEmbed, getFromNextDays, query } = require("./util");
+const { getAnnouncementEmbed, getFromNextDays, query, requireText } = require("./util");
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const dataFile = "./data.json";
