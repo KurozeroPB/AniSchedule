@@ -1,24 +1,27 @@
 {
-  "name": "anischedule",
-  "version": "1.0.0",
-  "description": "Discord bot that informs channels of newly aired episodes based on the AniList API",
-  "main": "src/main.js",
-  "scripts": {
-    "start": "node -r esm src/main.js"
-  },
-  "dependencies": {
-    "array-flatten": "^2.1.2",
-    "discord.js": "^11.4.2",
-    "dotenv": "^6.2.0",
-    "esm": "^3.2.14",
-    "node-fetch": "^2.3.0",
-    "require-text": "^0.0.1",
-    "express": "^4.16.4"
-  },
-  "author": "TehNut",
-  "repository": {
-    "url": "https://github.com/TehNut/AniSchedule",
-    "type": "git"
-  },
-  "license": "MIT"
+    "name": "anischedule",
+    "version": "1.0.0",
+    "description": "Discord bot that informs channels of newly aired episodes based on the AniList API",
+    "main": "src/main.js",
+    "scripts": {
+        "start": "cross-env NODE_ENV=production node src/main.js",
+        "test": "cross-env NODE_ENV=development node src/main.js",
+        "pretest": "npm run compile",
+        "compile": "tsc -p ."
+    },
+    "author": "TehNut",
+    "repository": {
+        "url": "https://github.com/TehNut/AniSchedule",
+        "type": "git"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "array-flatten": "^2.1.2",
+        "cross-env": "^6.0.3",
+        "discord.js": "^11.4.2",
+        "dotenv": "^6.2.0",
+        "express": "^4.16.4",
+        "node-fetch": "^2.3.0",
+        "require-text": "^0.0.1"
+    }
 }

@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+
 const streamingSites = [
     "Amazon",
     "Crunchyroll",
@@ -13,7 +14,7 @@ const rBlockedStreamingSites = [
     "Hulu"
 ];
 
-export async function query(query, variables) {
+exports.query = async (query, variables) => {
     const res = await fetch("https://graphql.anilist.co", {
         method: "POST",
         headers: {
@@ -25,20 +26,20 @@ export async function query(query, variables) {
             variables
         })
     });
-    return res.json();
+    return await res.json();
 }
 
-export function getFromNextDays(days = 1) {
+exports.getFromNextDays = (days = 1) => {
     return new Date(new Date().getTime() + (24 * 60 * 60 * 1000 * days));
 }
 
-export function getAnnouncementEmbed(entry, date, upNext = false) {
+exports.getAnnouncementEmbed = (entry, date, upNext = false) => {
     let description = `Episode ${entry.episode} of [${entry.media.title.romaji}](${entry.media.siteUrl})${upNext ? " is next." : " started airing / has just aired."}`;
     if (entry.media.externalLinks && entry.media.externalLinks.length > 0) {
         let streamLinks = "";
         let rBlockedstreamLinks = "";
         let multipleSites = false;
-        entry.media.externalLinks.forEach(site => {
+        entry.media.externalLinks.forEach((site) => {
 
             if (streamingSites.includes(site.site)) {
                 streamLinks += `${multipleSites ? " | " : ""} [${site.site}](${site.url})`;
@@ -50,8 +51,6 @@ export function getAnnouncementEmbed(entry, date, upNext = false) {
             }
         });
 
-
-
         if (streamLinks.length > 0) {
             description += `\n\nSimulcast: ${streamLinks}` + "\n(1h~2h para legenda, *geralmente*)"
         }
@@ -61,8 +60,6 @@ export function getAnnouncementEmbed(entry, date, upNext = false) {
         else {
             description += "\n\nAra Ara, nenhum simulcast detectado ou anilist está dormindo."
         }
-
-
     }
 
 

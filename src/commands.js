@@ -1,12 +1,11 @@
 //require("dotenv").config();
 const requireText = require("require-text");
-import { getAnnouncementEmbed, getFromNextDays, query } from "./util";
-import main from "./main";
+const { getAnnouncementEmbed, getFromNextDays, query } = require("./util");
 
 const alIdRegex = /anilist\.co\/anime\/(.\d*)/;
 const malIdRegex = /myanimelist\.net\/anime\/(.\d*)/;
 
-export default {
+module.exports = {
     watch: {
         description: "Adds a new anime to watch for new episodes of. Whatever channel this is used in is the channel the announcements will be made in."
             + (getPermissionString() ? " " + getPermissionString() : "")
@@ -169,23 +168,23 @@ export default {
 
     help: {
         description: "Prints out all available commands with a short description.",
-        handle(message, args, data) {
+        handle(message, args, data, ctx) {
             const embed = {
                 title: "WeebSchedule Commands",
                 author: {
                     name: "AniSchedule",
                     url: "https://anilist.co",
-                    icon_url: main.client.user.avatarURL
+                    icon_url: ctx.client.user.avatarURL
                 },
                 color: 4044018,
-                description: "[Author](https://anilist.co/user/TehNut/)\nCommands must be prefixed by `" + main.commandPrefix + "`",
+                description: "[Author](https://anilist.co/user/TehNut/)\nCommands must be prefixed by `" + ctx.commandPrefix + "`",
                 footer: {
                     text: "BETA"
                 },
                 fields: []
             };
 
-            Object.entries(main.commands).forEach((k, v) => embed.fields.push({ name: k[0], value: k[1].description, inline: true }));
+            Object.entries(ctx.commands).forEach((k, v) => embed.fields.push({ name: k[0], value: k[1].description, inline: true }));
 
             message.channel.send({ embed });
         }

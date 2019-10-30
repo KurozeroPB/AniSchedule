@@ -4,8 +4,8 @@ const discord = require("discord.js");
 const client = new discord.Client();
 const flatten = require("array-flatten");
 const fs = require("fs");
-import commands from "./commands";
-import { getAnnouncementEmbed, getFromNextDays, query } from "./util";
+const commands = require("./commands");
+const { getAnnouncementEmbed, getFromNextDays, query } = require("./util");
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const dataFile = "./data.json";
@@ -24,7 +24,7 @@ client.on("ready", () => {
     setInterval(() => handleSchedules(Math.round(getFromNextDays().getTime() / 1000)), 1000 * 60 * 60 * 24); // Schedule future runs every 24 hours
 });
 
-client.on('error', console.error);
+client.on("error", console.error);
 
 client.on("message", msg => {
     if (!msg.guild)
@@ -39,7 +39,7 @@ client.on("message", msg => {
         const command = commands[msgContent[0].substr(commandPrefix.length)];
         if (command) {
             const serverData = data[msg.guild.id] || {};
-            const promise = command.handle(msg, msgContent.slice(1), serverData);
+            const promise = command.handle(msg, msgContent.slice(1), serverData, { commandPrefix, commands, client });
             if (promise) {
                 promise.then(ret => {
                     if (ret) {
@@ -100,24 +100,19 @@ function makeAnnouncement(entry, date, upNext = false) {
     });
 }
 
-export default {
-    commandPrefix,
-    commands,
-    client
-}
-
-const express = require('express');
-const http = require('http');
+const express = require("express");
+const http = require("http");
 const app = express();
 
-app.use(express.static('public'))
+app.use(express.static("public"))
 app.listen(process.env.PORT, () => {
     //console.log(`Your app is listening on port ${listener.address().port}`)
 })
 
-app.get('/', (request, response) => {
+app.get("/", (request, response) => {
     response.sendStatus(200);
 });
+
 setInterval(() => {
     http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
 }, 280000);
