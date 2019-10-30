@@ -1,4 +1,4 @@
-require("dotenv").config();
+//require("dotenv").config();
 const requireText = require("require-text");
 import {getAnnouncementEmbed, getFromNextDays, query} from "./util";
 import main from "./main";
@@ -17,21 +17,21 @@ export default {
         return;
       }
 
-      message.channel.startTyping();
+      
       const channelData = data[message.channel.id] || {shows: []};
       const watched = channelData.shows || [];
 
       const watchId = await getMediaId(args[0]);
       if (!watchId || watched.includes(watchId)) {
         message.react("👎");
-        message.channel.stopTyping();
+        
         return;
       }
       watched.push(watchId);
       channelData.shows = watched;
       data[message.channel.id] = channelData;
+      message.channel.stopTyping();      
       message.react("👍");
-      message.channel.stopTyping();
       return data;
     }
   },
@@ -45,24 +45,24 @@ export default {
         return;
       }
 
-      message.channel.startTyping();
+      
       const channelData = data[message.channel.id];
       if (!channelData || !channelData.shows || channelData.shows.length === 0) {
         message.react("🤷");
-        message.channel.stopTyping();
+        
         return;
       }
 
       const watchId = await getMediaId(args[0]);
       if (!watchId || !channelData.shows.includes(watchId)) {
         message.react("👎");
-        message.channel.stopTyping();
+        
         return;
       }
       channelData.shows = channelData.shows.filter(id => id !== watchId);
       data[message.channel.id] = channelData;
       message.react("👍");
-      message.channel.stopTyping();
+      
       return data;
     }
   },
@@ -75,24 +75,24 @@ export default {
         return;
       }
 
-      message.channel.startTyping();
+      
       query(requireText("./query/Schedule.graphql", require), { page: 0, watched: channelData.shows, nextDay: Math.round(getFromNextDays(7).getTime() / 1000) }, res => {
         if (res.errors) {
           console.log(JSON.stringify(res.errors));
-          message.channel.stopTyping();
+          
           return;
         }
 
         if (res.data.Page.airingSchedules.length === 0) {
           message.react("👎");
-          message.channel.stopTyping();
+          
           return;
         }
 
         const anime = res.data.Page.airingSchedules[0];
         const embed = getAnnouncementEmbed(anime, new Date(anime.airingAt * 1000), true);
         message.channel.send({embed});
-        message.channel.stopTyping();
+        
       });
     }
   },
@@ -105,7 +105,7 @@ export default {
         return;
       }
 
-      message.channel.startTyping();
+      
       handleWatchingPage(0);
 
       function handleWatchingPage(page) {
@@ -133,7 +133,7 @@ export default {
           }
           if (description.length === 0)
             message.channel.send("No currently airing shows are being announced.");
-          message.channel.stopTyping();
+          
         });
       }
     }
@@ -167,24 +167,25 @@ export default {
 
       data[message.channel.id] = channelData;
       message.react("👍");
-      message.channel.stopTyping();
+      
       return data;
     }
   },
+  
   help: {
     description: "Prints out all available commands with a short description.",
     handle(message, args, data) {
       const embed = {
-        title: "AniSchedule Commands",
+        title: "WeebSchedule Commands",
         author: {
           name: "AniSchedule",
           url: "https://anilist.co",
           icon_url: main.client.user.avatarURL
         },
         color: 4044018,
-        description: "[GitHub](https://github.com/TehNut/AniSchedule) | [Author](https://anilist.co/user/TehNut/)\nCommands must be prefixed by `" + main.commandPrefix + "`",
+        description: "[Author](https://anilist.co/user/TehNut/)\nCommands must be prefixed by `" + main.commandPrefix + "`",
         footer: {
-          text: "For more information, see the README on the GitHub page"
+          text: "BETA"
         },
         fields: []
       };

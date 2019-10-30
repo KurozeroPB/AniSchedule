@@ -3,7 +3,9 @@
 A Discord bot that uses the [AniList](https://anilist.co) API to retrieve the airing schedule for configured anime and 
 sends a message when a new episode has aired.
 
-![Example Announcement](./img/example.png) ![Example Announcement](./img/example2.png)
+Edit: This branch contains a few additional lines for [Glitch](https://glitch.com/) functionality.
+
+![Example Announcement](https://i.imgur.com/4D1VGjq.png) ![Example Announcement](https://i.imgur.com/HeegV0V.png)
 
 ## Running Locally
 
@@ -12,7 +14,7 @@ Make sure you have [Node.js](https://nodejs.org/) installed.
 Run these commands to get the project locally:
 
 ```sh
-git clone https://github.com/TehNut/AniSchedule.git # or clone your own fork
+git clone https://github.com/L11K/AniSchedule.git # or clone your own fork
 cd AniSchedule
 npm install
 ```

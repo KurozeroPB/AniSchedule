@@ -12,7 +12,8 @@
     "dotenv": "^6.2.0",
     "esm": "^3.2.14",
     "node-fetch": "^2.3.0",
-    "require-text": "^0.0.1"
+    "require-text": "^0.0.1",
+    "express": "^4.16.4"
   },
   "author": "TehNut",
   "repository": {

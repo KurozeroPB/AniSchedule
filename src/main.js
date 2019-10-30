@@ -105,3 +105,19 @@ export default {
   commands,
   client
 }
+
+const express = require('express');
+const http = require('http');
+const app = express();
+
+app.use(express.static('public'))
+app.listen(process.env.PORT, () => {
+    //console.log(`Your app is listening on port ${listener.address().port}`)
+})
+
+app.get('/', (request, response) => {
+    response.sendStatus(200);
+});
+setInterval(() => {
+    http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 280000);

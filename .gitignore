@@ -2,3 +2,5 @@
 data.json
 /node_modules/
 /.idea
+.glitch-assets
+shrinkwrap.yaml
