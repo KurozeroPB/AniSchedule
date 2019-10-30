@@ -1,52 +1,55 @@
 require("dotenv").config();
-const discord = require("discord.js");
-const client = new discord.Client();
-const flatten = require("array-flatten");
 const fs = require("fs");
-const commands = require("./commands");
+const CommandLoader = require("./structures/CommandLoader");
+const CommandHandler = require("./structures/CommandHandler");
+const { Client } = require("discord.js");
 const { getAnnouncementEmbed, getFromNextDays, query, requireText } = require("./util");
+
+const client = new Client();
+const commandLoader = new CommandLoader();
+const commandHandler = new CommandHandler(client);
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const dataFile = "./data.json";
 let data = {};
+let ready = false;
 
-client.on("ready", () => {
-    console.log(`Logged in as ${client.user.tag}`);
+client.on("ready", async () => {
+    if (!ready) {
+        console.log(`Logged in as ${client.user.tag}`);
 
-    if (fs.existsSync(dataFile)) {
-        data = JSON.parse(fs.readFileSync(dataFile));
+        if (fs.existsSync(dataFile)) {
+            data = JSON.parse(fs.readFileSync(dataFile));
+        } else {
+            fs.writeFileSync(dataFile, JSON.stringify({}));
+        }
+
+        client.commands = await commandLoader.load(`${__dirname}/commands`);
+
+        handleSchedules(Math.round(getFromNextDays().getTime() / 1000)); // Initial run
+        setInterval(() => handleSchedules(Math.round(getFromNextDays().getTime() / 1000)), 1000 * 60 * 60 * 24); // Schedule future runs every 24 hours
+
+        ready = true;
     } else {
-        fs.writeFileSync(dataFile, JSON.stringify({}));
+        console.log("Client reconnected");
     }
-
-    handleSchedules(Math.round(getFromNextDays().getTime() / 1000)); // Initial run
-    setInterval(() => handleSchedules(Math.round(getFromNextDays().getTime() / 1000)), 1000 * 60 * 60 * 24); // Schedule future runs every 24 hours
 });
 
 client.on("error", console.error);
 
-client.on("message", msg => {
-    if (!msg.guild)
-        return;
+client.on("message", async (msg) => {
+    if (!ready) return; // Bot not ready yet
+    if (!msg.guild) return;
+    if (!msg.author) return;
+    if (msg.author.bot) return;
+    if (msg.author.discriminator === "0000") return; // Probably a webhook
 
-    if (msg.author.bot)
-        return;
-
-    const msgContent = msg.content.split(" ");
-
-    if (msgContent[0].startsWith(commandPrefix)) {
-        const command = commands[msgContent[0].substr(commandPrefix.length)];
-        if (command) {
-            const serverData = data[msg.guild.id] || {};
-            const promise = command.handle(msg, msgContent.slice(1), serverData, { commandPrefix, commands, client });
-            if (promise) {
-                promise.then(ret => {
-                    if (ret) {
-                        data[msg.guild.id] = ret;
-                        fs.writeFileSync(dataFile, JSON.stringify(data));
-                    }
-                });
-            }
+    if (msg.content.startsWith(commandPrefix)) {
+        const serverData = data[msg.guild.id] || {};
+        const ret = await commandHandler.handleCommand(msg, serverData);
+        if (ret) {
+            data[msg.guild.id] = ret;
+            fs.writeFileSync(dataFile, JSON.stringify(data));
         }
     }
 });
@@ -77,7 +80,7 @@ function getAllWatched() {
     Object.values(data).forEach(server => {
         Object.values(server).filter(c => c.shows).forEach(c => c.shows.forEach(s => watched.push(s)));
     });
-    return [...flatten(watched)];
+    return watched.flat();
 }
 
 function makeAnnouncement(entry, date, upNext = false) {

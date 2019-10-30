@@ -3,21 +3,22 @@
     "version": "1.0.0",
     "description": "Discord bot that informs channels of newly aired episodes based on the AniList API",
     "main": "src/main.js",
-    "scripts": {
-        "start": "cross-env NODE_ENV=production node src/main.js",
-        "test": "cross-env NODE_ENV=development node src/main.js",
-        "pretest": "npm run compile",
-        "compile": "tsc -p .",
-        "reinstall": "rm -rf ./node_modules && rm ./package-lock.json && npm install"
-    },
     "author": "TehNut",
+    "license": "MIT",
+    "engines": {
+        "node": ">=12.x.x"
+    },
     "repository": {
         "url": "https://github.com/TehNut/AniSchedule",
         "type": "git"
     },
-    "license": "MIT",
+    "scripts": {
+        "start": "cross-env NODE_ENV=production node src/main.js",
+        "test": "cross-env NODE_ENV=development node src/main.js",
+        "reinstall": "rm -rf ./node_modules && rm ./package-lock.json && npm install"
+    },
     "dependencies": {
-        "array-flatten": "^2.1.2",
+        "@kurozero/collection": "^0.4.8",
         "cross-env": "^6.0.3",
         "discord.js": "^11.4.2",
         "dotenv": "^6.2.0",
