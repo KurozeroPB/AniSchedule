@@ -1,15 +1,18 @@
-const Command = require("../structures/Command");
-const { query, requireText } = require("../util");
+import Command from "../structures/Command";
+import { Message, Client, TextableChannel } from "eris";
+import { IDataGuild, IDataChannel } from "../interfaces/IData";
+import { IWatchingResponse } from "src/interfaces/IWatching";
+import { query, requireText } from "../util";
 
-class Watching extends Command {
+export default class Watching extends Command {
+    public description: string;
+
     constructor() {
         super("watching");
         this.description = "Prints a list of all anime names being watched that are still currently airing.";
     }
 
-    async run(message, args, client, data) {
-        const self = this;
-        
+    async run(message: Message, _args: string[], _client: Client, data: IDataGuild): Promise<void> {
         const channelData = data[message.channel.id];
         if (!channelData || !channelData.shows || channelData.shows.length === 0) {
             message.addReaction("👎");
@@ -17,18 +20,20 @@ class Watching extends Command {
         }
 
 
-        await handleWatchingPage(0);
+        await this.handleWatchingPage(0, channelData, message);
+    }
 
-        async function handleWatchingPage(page) {
-            const res = await query(requireText("../query/Watching.graphql", require), { watched: channelData.shows, page });
-            let description = "";
-            res.data.Page.media.forEach(m => {
+    async handleWatchingPage(page: number, channelData: IDataChannel, message: Message): Promise<void> {
+        const res = await query(requireText("./query/Watching.graphql"), { watched: channelData.shows, page }) as IWatchingResponse;
+        let description = "";
+        if (res.data) {
+            res.data.Page.media.forEach((m) => {
                 if (m.status !== "RELEASING")
                     return;
 
                 const nextLine = `\n- [${m.title.romaji}](${m.siteUrl}) (\`${m.id}\`)`;
                 if (1000 - description.length < nextLine.length) {
-                    self.sendWatchingList(description, message.channel);
+                    this.sendWatchingList(description, message.channel);
                     console.log(description.length);
                     description = "";
                 }
@@ -36,10 +41,10 @@ class Watching extends Command {
                 description += nextLine;
             });
             if (description.length !== 0)
-                self.sendWatchingList(description, message.channel);
+                this.sendWatchingList(description, message.channel);
 
             if (res.data.Page.pageInfo.hasNextPage) {
-                await handleWatchingPage(res.data.Page.pageInfo.currentPage + 1);
+                await this.handleWatchingPage(res.data.Page.pageInfo.currentPage + 1, channelData, message);
                 return;
             }
             if (description.length === 0)
@@ -47,7 +52,7 @@ class Watching extends Command {
         }
     }
 
-    sendWatchingList(description, channel) {
+    sendWatchingList(description: string, channel: TextableChannel): void {
         const embed = {
             title: "Current announcements ",
             color: 4044018,
@@ -61,5 +66,3 @@ class Watching extends Command {
         channel.createMessage({ embed });
     }
 }
-
-module.exports = Watching;

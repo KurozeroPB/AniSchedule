@@ -1,8 +1,8 @@
 {
     "name": "anischedule",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Discord bot that informs channels of newly aired episodes based on the AniList API",
-    "main": "src/main.js",
+    "main": "build/src/main.js",
     "author": "TehNut",
     "license": "MIT",
     "engines": {
@@ -13,16 +13,34 @@
         "type": "git"
     },
     "scripts": {
-        "start": "cross-env NODE_ENV=production node src/main.js",
-        "test": "cross-env NODE_ENV=development node src/main.js",
-        "reinstall": "rm -rf ./node_modules && rm ./package-lock.json && npm install"
+        "start": "cross-env NODE_ENV=production node build/src/main.js",
+        "test": "cross-env NODE_ENV=development ts-node src/main.ts",
+        "reinstall": "rm -rf ./node_modules && rm ./package-lock.json && npm install",
+        "pretest": "npm run lint",
+        "compile": "tsc -p .",
+        "fix": "gts fix",
+        "lint": "eslint --ext .ts .",
+        "lint:fix": "eslint --ext .ts --fix ."
     },
     "dependencies": {
         "@kurozero/collection": "^0.4.8",
         "cross-env": "^6.0.3",
-        "dotenv": "^6.2.0",
+        "dotenv": "^8.2.0",
         "eris": "^0.11.0",
-        "express": "^4.16.4",
-        "node-fetch": "^2.3.0"
+        "express": "^4.17.1",
+        "node-fetch": "^2.6.0"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.1",
+        "@types/node": "^12.12.3",
+        "@types/node-fetch": "^2.5.2",
+        "@typescript-eslint/eslint-plugin": "^2.6.0",
+        "@typescript-eslint/parser": "^2.6.0",
+        "eslint": "^6.6.0",
+        "gts": "^1.1.0",
+        "ts-node": "^8.4.1",
+        "tsconfig-paths": "^3.9.0",
+        "tslint": "^5.20.0",
+        "typescript": "^3.6.4"
     }
 }

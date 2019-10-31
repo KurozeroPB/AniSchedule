@@ -1,13 +1,18 @@
-const Command = require("../structures/Command");
-const { getFromNextDays, getAnnouncementEmbed, query, requireText } = require("../util");
+import Command from "../structures/Command";
+import { Message, Client } from "eris";
+import { IDataGuild } from "../interfaces/IData";
+import { getFromNextDays, getAnnouncementEmbed, query, requireText } from "../util";
+import { IScheduleResponse } from "src/interfaces/ISchedule";
 
-class Next extends Command {
+export default class Next extends Command {
+    public description: string;
+
     constructor() {
         super("next");
         this.description = "Displays the next anime to air (in the next 7 days) that the current channel is watching.";
     }
 
-    async run(message, args, client, data) {
+    async run(message: Message, args: string[], client: Client, data: IDataGuild): Promise<void> {
         const channelData = data[message.channel.id];
         if (!channelData || !channelData.shows || channelData.shows.length === 0) {
             message.addReaction("👎");
@@ -15,12 +20,14 @@ class Next extends Command {
         }
 
 
-        const res = await query(requireText("../query/Schedule.graphql", require), { page: 0, watched: channelData.shows, nextDay: Math.round(getFromNextDays(7).getTime() / 1000) });
+        const res = await query(requireText("./query/Schedule.graphql"), { page: 0, watched: channelData.shows, nextDay: Math.round(getFromNextDays(7).getTime() / 1000) }) as IScheduleResponse;
         if (res.errors) {
             console.log(JSON.stringify(res.errors));
 
             return;
         }
+
+        if (!res.data) return;
 
         if (res.data.Page.airingSchedules.length === 0) {
             message.addReaction("👎");
@@ -33,5 +40,3 @@ class Next extends Command {
         message.channel.createMessage({ embed });
     }
 }
-
-module.exports = Next;

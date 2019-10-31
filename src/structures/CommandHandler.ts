@@ -1,16 +1,16 @@
-class CommandHandler {
-    constructor(client) {
+import { Client, Message } from "eris";
+import { IDataGuild } from "src/interfaces/IData";
+
+export default class CommandHandler {
+    public client: Client;
+
+    constructor(client: Client) {
         this.client = client;
     }
 
-    /**
-     * Handle commands
-     * @param {Message} msg 
-     * @param {Record<string, any>} serverData 
-     */
-    async handleCommand(msg, serverData) {
+    async handleCommand(msg: Message, serverData: IDataGuild): Promise<any> {
         const parts = msg.content.split(" ");
-        const name = parts[0].slice(process.env.COMMAND_PREFIX.length);
+        const name = parts[0].slice((process.env.COMMAND_PREFIX || "").length);
 
         const command = this.client.commands.find((cmd) => cmd.name === name);
         if (!command) return null; // Command doesn't exist
@@ -32,5 +32,3 @@ class CommandHandler {
         }
     }
 }
-
-module.exports = CommandHandler;

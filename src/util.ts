@@ -1,5 +1,9 @@
-const fetch = require("node-fetch");
-const fs = require("fs");
+import fetch from "node-fetch";
+import fs from "fs";
+import path from "path";
+import { EmbedBase } from "eris";
+import { ISchedule, IScheduleResponse } from "./interfaces/ISchedule";
+import { IWatchingResponse } from "./interfaces/IWatching";
 
 const streamingSites = [
     "Amazon",
@@ -15,11 +19,11 @@ const rBlockedStreamingSites = [
     "Hulu"
 ];
 
-exports.requireText = (name, require) => {
-    return fs.readFileSync(require.resolve(name)).toString();
+export function requireText(name: string): string {
+    return fs.readFileSync(path.join(__dirname, name), "utf8").toString(); // eslint-disable-line no-sync
 }
 
-exports.query = async (query, variables) => {
+export async function query(q: string, variables: Record<string|number|symbol, any>): Promise<IScheduleResponse | IWatchingResponse> {
     const res = await fetch("https://graphql.anilist.co", {
         method: "POST",
         headers: {
@@ -27,25 +31,24 @@ exports.query = async (query, variables) => {
             "Accept": "application/json"
         },
         body: JSON.stringify({
-            query,
+            query: q,
             variables
         })
     });
     return await res.json();
 }
 
-exports.getFromNextDays = (days = 1) => {
+export function getFromNextDays(days = 1): Date {
     return new Date(new Date().getTime() + (24 * 60 * 60 * 1000 * days));
 }
 
-exports.getAnnouncementEmbed = (entry, date, upNext = false) => {
+export function getAnnouncementEmbed(entry: ISchedule, date: Date, upNext = false): EmbedBase {
     let description = `Episode ${entry.episode} of [${entry.media.title.romaji}](${entry.media.siteUrl})${upNext ? " is next." : " started airing / has just aired."}`;
     if (entry.media.externalLinks && entry.media.externalLinks.length > 0) {
         let streamLinks = "";
         let rBlockedstreamLinks = "";
         let multipleSites = false;
         entry.media.externalLinks.forEach((site) => {
-
             if (streamingSites.includes(site.site)) {
                 streamLinks += `${multipleSites ? " | " : ""} [${site.site}](${site.url})`;
                 multipleSites = true;
@@ -57,19 +60,17 @@ exports.getAnnouncementEmbed = (entry, date, upNext = false) => {
         });
 
         if (streamLinks.length > 0) {
-            description += `\n\nSimulcast: ${streamLinks}` + "\n(1h~2h para legenda, *geralmente*)"
-        }
-        else if (rBlockedstreamLinks.length > 0) {
-            description += "\n\nO Kawaii koto, simulcasts restrito no brasil: " + `${rBlockedstreamLinks}`
-        }
-        else {
-            description += "\n\nAra Ara, nenhum simulcast detectado ou anilist está dormindo."
+            description += `\n\nSimulcast: ${streamLinks}\n(1h~2h para legenda, *geralmente*)`;
+        } else if (rBlockedstreamLinks.length > 0) {
+            description += `\n\nO Kawaii koto, simulcasts restrito no brasil: ${rBlockedstreamLinks}`;
+        } else {
+            description += "\n\nAra Ara, nenhum simulcast detectado ou anilist está dormindo.";
         }
     }
 
 
-    let source = (entry.media.source.length > 0) ? `Source: ${entry.media.source}` : "N/A"
-    let studio = (entry.media.studios.edges.length > 0 && entry.media.studios.edges[0].node.name) ? `Studio: ${entry.media.studios.edges[0].node.name}` : "No studio found"
+    let source = (entry.media.source.length > 0) ? `Source: ${entry.media.source}` : "N/A";
+    let studio = (entry.media.studios.edges.length > 0 && entry.media.studios.edges[0].node.name) ? `Studio: ${entry.media.studios.edges[0].node.name}` : "No studio found";
 
     return {
         color: entry.media.coverImage.color ? parseInt(entry.media.coverImage.color.substr(1), 16) : 5336051,
@@ -82,7 +83,7 @@ exports.getAnnouncementEmbed = (entry, date, upNext = false) => {
             icon_url: "https://i.imgur.com/mYFVGLM.png"
         },
         description,
-        timestamp: date,
+        timestamp: date.toISOString(),
         footer: {
             text: `${source} | ${studio} `
         }

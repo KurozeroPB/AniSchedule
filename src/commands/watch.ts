@@ -1,14 +1,16 @@
-const Command = require("../structures/Command");
+import Command from "../structures/Command";
+import { Message, Client } from "eris";
+import { IDataGuild } from "../interfaces/IData";
 
-class Watch extends Command {
+export default class Watch extends Command {
+    public description: string;
+
     constructor() {
         super("watch");
-        this.description = "Adds a new anime to watch for new episodes of. Whatever channel this is used in is the channel the announcements will be made in."
-        + (this.getPermissionString() ? " " + this.getPermissionString() : "")
-        + "\nYou may provide an AniList entry link, a direct AniList media ID, or a MyAnimeList link.";
+        this.description = `Adds a new anime to watch for new episodes of. Whatever channel this is used in is the channel the announcements will be made in.${this.getPermissionString() ? ` ${this.getPermissionString()}` : ""}\nYou may provide an AniList entry link, a direct AniList media ID, or a MyAnimeList link.`;
     }
 
-    async run(message, args, client, data) {
+    async run(message: Message, args: string[], _client: Client, data: IDataGuild): Promise<IDataGuild | undefined> {
         if (!this.checkModifyPermission(message)) {
             message.addReaction("👎");
             return;
@@ -26,10 +28,7 @@ class Watch extends Command {
         watched.push(watchId);
         channelData.shows = watched;
         data[message.channel.id] = channelData;
-        // message.channel.stopTyping();
         message.addReaction("👍");
         return data;
     }
 }
-
-module.exports = Watch;
