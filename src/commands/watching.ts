@@ -24,7 +24,8 @@ export default class Watching extends Command {
     }
 
     async handleWatchingPage(page: number, channelData: IDataChannel, message: Message): Promise<void> {
-        const res = await query(requireText("./query/Watching.graphql"), { watched: channelData.shows, page }) as IWatchingResponse;
+        const q = await requireText("./query/Watching.graphql");
+        const res = await query(q, { watched: channelData.shows, page }) as IWatchingResponse;
         let description = "";
         if (res.data) {
             res.data.Page.media.forEach((m) => {

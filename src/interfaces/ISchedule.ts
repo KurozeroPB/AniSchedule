@@ -44,18 +44,18 @@ export interface ISchedule {
     timeUntilAiring: number;
 }
 
-export interface IPageInfo {
+export interface ISchedulePageInfo {
     currentPage: number;
     hasNextPage: boolean;
 }
 
-export interface IPage {
-    pageInfo: IPageInfo;
+export interface ISchedulePage {
+    pageInfo: ISchedulePageInfo;
     airingSchedules: ISchedule[];
 }
 
 export interface IScheduleResponseData {
-    Page: IPage;
+    Page: ISchedulePage;
 }
 
 export interface IScheduleError {

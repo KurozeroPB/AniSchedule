@@ -36,7 +36,8 @@ export default class Cleanup extends Command {
     }
 
     async handlePage(channelData: IDataChannel, page = 0): Promise<void> {
-        const res = await query(requireText("./query/Watching.graphql"), { watched: channelData.shows, page }) as IWatchingResponse;
+        const q = await requireText("./query/Watching.graphql");
+        const res = await query(q, { watched: channelData.shows, page }) as IWatchingResponse;
         if (!res.data) return;
 
         res.data.Page.media.filter((e) => e.status === "FINISHED").forEach((e) => this.finished.push(e));

@@ -20,7 +20,8 @@ export default class Next extends Command {
         }
 
 
-        const res = await query(requireText("./query/Schedule.graphql"), { page: 0, watched: channelData.shows, nextDay: Math.round(getFromNextDays(7).getTime() / 1000) }) as IScheduleResponse;
+        const q = await requireText("./query/Schedule.graphql");
+        const res = await query(q, { page: 0, watched: channelData.shows, nextDay: Math.round(getFromNextDays(7).getTime() / 1000) }) as IScheduleResponse;
         if (res.errors) {
             console.log(JSON.stringify(res.errors));
 

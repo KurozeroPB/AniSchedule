@@ -8,7 +8,7 @@ import CommandHandler from "./structures/CommandHandler";
 import { IData } from "./interfaces/IData";
 import { Client, AnyGuildChannel, TextChannel } from "eris";
 import { getAnnouncementEmbed, getFromNextDays, query, requireText } from "./util";
-import { IPage, ISchedule } from "./interfaces/ISchedule";
+import { ISchedulePage, ISchedule } from "./interfaces/ISchedule";
 
 import "./structures/Extended";
 
@@ -55,26 +55,26 @@ function getAllWatched(): number[] {
     return watched.flat();
 }
 
-function handleSchedules(time: number, page?: number): void {
-    query(requireText("./query/Schedule.graphql"), { page: page, watched: getAllWatched(), nextDay: time }).then((res) => {
-        if (res.errors) {
-            console.log(JSON.stringify(res.errors));
-            return;
-        }
+async function handleSchedules(time: number, page?: number): Promise<void> {
+    const q = await requireText("./query/Schedule.graphql");
+    const res = await query(q, { page: page, watched: getAllWatched(), nextDay: time });
+    if (res.errors) {
+        console.log(JSON.stringify(res.errors));
+        return;
+    }
 
-        if (!res.data) return;
+    if (!res.data) return;
 
-        const Page = res.data.Page as IPage;
-        Page.airingSchedules.forEach((e) => {
-            const date = new Date(e.airingAt * 1000);
-            console.log(`Scheduling announcement for ${e.media.title.romaji} on ${date}`);
-            setTimeout(() => makeAnnouncement(e, date), e.timeUntilAiring * 1000);
-        });
-
-        // Gather any other pages
-        if (res.data.Page.pageInfo.hasNextPage)
-            handleSchedules(time, res.data.Page.pageInfo.currentPage + 1);
+    const Page = res.data.Page as ISchedulePage;
+    Page.airingSchedules.forEach((e) => {
+        const date = new Date(e.airingAt * 1000);
+        console.log(`Scheduling announcement for ${e.media.title.romaji} on ${date}`);
+        setTimeout(() => makeAnnouncement(e, date), e.timeUntilAiring * 1000);
     });
+
+    // Gather any other pages
+    if (res.data.Page.pageInfo.hasNextPage)
+        await handleSchedules(time, res.data.Page.pageInfo.currentPage + 1);
 }
 
 client.on("ready", async () => {
@@ -91,8 +91,8 @@ client.on("ready", async () => {
 
         client.commands = await commandLoader.load(`${__dirname}/commands`);
 
-        handleSchedules(Math.round(getFromNextDays().getTime() / 1000)); // Initial run
-        setInterval(() => handleSchedules(Math.round(getFromNextDays().getTime() / 1000)), 1000 * 60 * 60 * 24); // Schedule future runs every 24 hours
+        await handleSchedules(Math.round(getFromNextDays().getTime() / 1000)); // Initial run
+        setInterval(async () => await handleSchedules(Math.round(getFromNextDays().getTime() / 1000)), 1000 * 60 * 60 * 24); // Schedule future runs every 24 hours
 
         ready = true;
     } else {

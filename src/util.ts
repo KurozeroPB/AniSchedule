@@ -19,8 +19,8 @@ const rBlockedStreamingSites = [
     "Hulu"
 ];
 
-export function requireText(name: string): string {
-    return fs.readFileSync(path.join(__dirname, name), "utf8").toString(); // eslint-disable-line no-sync
+export async function requireText(name: string): Promise<string> {
+    return await fs.promises.readFile(path.join(__dirname, name), "utf8");
 }
 
 export async function query(q: string, variables: Record<string|number|symbol, any>): Promise<IScheduleResponse | IWatchingResponse> {
